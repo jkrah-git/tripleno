@@ -4,7 +4,8 @@
 
 CHECK="`/usr/bin/whoami`.`/usr/bin/hostname -s`"
 [ "x$CHECK" = "xstack.undercloud" ] || abort "CHECK=[$CHECK]"
-
+BASEDIR="`( cd $(dirname $0)/.. && pwd )`"
+echo "BASEDIR=[$BASEDIR]"
 
 # [ -f ~/templates/network_data.yaml ] || abort "~/templates/network_data.yaml not found"
 CONF=~/.overcloud.conf
