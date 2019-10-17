@@ -264,7 +264,7 @@ exit
 fi
 
 if [ ! -f "/home/stack/.server.ok" ]; then
-. operator.test.rc 
+. ~/operator.test.rc || abort "~/operator.test.rc failed"
 set -x
 openstack server create --flavor default --key-name cloud-user --security-group open_ssh --wait --image centos7 --network external ext-server
 openstack server create --flavor default --key-name cloud-user --security-group open_ssh --wait --image centos7 --network internal int-server
