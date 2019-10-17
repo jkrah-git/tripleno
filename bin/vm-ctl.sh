@@ -21,11 +21,16 @@ usage()
 	exit 1
 }
 # ------------------------------
+
 #cd `dirname $0`/.. || abort "cd err"
 # cd `dirname $0` || abort "cd err"
-BASE_DIR="`dirname $0`"
-XML_DIR="$BASE_DIR/xml"
-IRO_DIR="$BASE_DIR/ironic"
+BASEDIR="`( cd $(dirname $0)/.. && pwd )`"
+echo "BASEDIR=[$BASEDIR]"
+. ${BASEDIR}/bin/prompt.inc || exit 1
+
+
+XML_DIR="$BASEDIR/data/xml"
+IRO_DIR="$BASEDIR/data/json"
 IMG_DIR=/var/lib/libvirt/images
 
 [ -d "$XML_DIR" ] || abort "$XML_DIR dir err"
@@ -148,7 +153,7 @@ fi
 # ------------------------------
 if [ "$CMD" = "mkjson" ]; then
 
-	IRON_TEMPLATE="$BASE_DIR/ironic-node.json"
+	IRON_TEMPLATE="$BASEDIR/bin/ironic-node.json"
 	[ -f "$IRON_TEMPLATE" ] || abort "cant find template [$IRON_TEMPLATE]"
 	[ -f "$IRO_DIR/${DOM}.json" ] && abort "$IRO_DIR/${DOM}.json] alread exists"
 
