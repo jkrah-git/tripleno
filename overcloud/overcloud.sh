@@ -195,7 +195,24 @@ if [ ! -f ~/.overcloud.end ]; then
 	###################################
 	# /data/nfs/openstack/templates/status.sh
 	`dirname $0`/../bin/status.sh	
+	. overcloudrc || abort
+	openstack network create --share --external --provider-network-type flat --provider-physical-network datacentre external
+	openstack subnet create --network external --gateway 172.16.100.1  --dhcp --subnet-range 172.16.100.0/24 --allocation-pool start=172.16.100.200,end=172.16.100.250 external-subnet
 fi
+
+`dirname $0`/../bin/status.sh	
+cat << EOinstallmsg
+#######################
+## run on all controllers iptables memcached (tcp/11211) ..
+iptables -I INPUT 5  -i vlan13 -p tcp --dport 11211 -j ACCEPT  -m state --state NEW -m comment --comment "added memcached"
+## perm fix
+grep '"added memcached"' /etc/sysconfig/iptables || \\
+sed -i '9i-A INPUT -i vlan13 -p tcp --dport 11211  -m state --state NEW -m comment --comment "added memcached" -j ACCEPT' /etc/sysconfig/iptables
+#######################
+EOinstallmsg
+
+exit 0
+
 
 
 if [ ! -f /home/stack/operator.test.rc ]; then
@@ -204,8 +221,6 @@ if [ ! -f /home/stack/operator.test.rc ]; then
 	################## default (br-ex:datacentre) provider network (currenlty br-ex=prov.i/f)
 	. overcloudrc || abort
 	set -x
-	openstack network create --share --external --provider-network-type flat --provider-physical-network datacentre external
-	openstack subnet create --network external --gateway 172.16.100.1  --dhcp --subnet-range 172.16.100.0/24 --allocation-pool start=172.16.100.200,end=172.16.100.250 external-subnet
 	openstack floating ip create external
 	## 172.16.101.208
 	
