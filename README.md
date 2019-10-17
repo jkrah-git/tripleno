@@ -67,3 +67,14 @@ EOF
 overcloud/overcloud.sh
 
 ```
+
+## memcached still blocker
+```
+## on all controllers
+Oct 17 16:04:38 controller2 kernel: IN=vlan13 OUT= MAC=9a:13:4e:1d:06:da:3e:6e:99:7d:8f:f0:08:00 SRC=172.16.213.10 DST=172.16.213.12 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=41202 DF PROTO=TCP SPT=35806 DPT=11211 WINDOW=29200 RES=0x00 SYN URGP=0 
+Oct 17 16:04:39 controller2 kernel: IN=vlan13 OUT= MAC=9a:13:4e:1d:06:da:3e:6e:99:7d:8f:f0:08:00 SRC=172.16.213.10 DST=172.16.213.12 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=41203 DF PROTO=TCP SPT=35806 DPT=11211 WINDOW=29200 RES=0x00 SYN URGP=0 
+```
+* add firewall rule
+```
+iptables -I INPUT 5  -i vlan13 -p tcp --dport 11211 -j ACCEPT  -m state --state NEW -m comment --comment "added memcached"
+```
