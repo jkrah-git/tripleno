@@ -6,7 +6,7 @@ parameter_defaults:
   OvercloudCephStorageFlavor: ceph-storage
   ControllerCount: 3
   ComputeCount: 2
-  CephStorageCount: 0
+  CephStorageCount: 3
   NeutronEnableIsolatedMetadata: true
   ControllerExtraConfig:
     neutron::agents::dhcp::enable_isolated_metadata: true
