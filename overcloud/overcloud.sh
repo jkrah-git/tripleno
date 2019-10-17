@@ -5,7 +5,8 @@
 CHECK="`/usr/bin/whoami`.`/usr/bin/hostname -s`"
 [ "x$CHECK" = "xstack.undercloud" ] || abort "CHECK=[$CHECK]"
 
-[ -f ~/templates/network_data.yaml ] || abort "~/templates/network_data.yaml not found"
+
+# [ -f ~/templates/network_data.yaml ] || abort "~/templates/network_data.yaml not found"
 CONF=~/.overcloud.conf
 ## CONF should export the following
 ## EXT_BR= ovs-bridgle for External GW
@@ -154,6 +155,7 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	if [ ! -f ~/templates/network_data.yaml ]; then
 		###################################
 		# ln -s /data/nfs/openstack/tripleo/templates . || abort "templates symlink err"
+		ln -s `dirname $0`/../ templates ~/ || abort "templates symlink err"
 		abort "~/templates/network_data.yaml not found.."
 	fi
 
