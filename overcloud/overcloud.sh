@@ -155,8 +155,11 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	if [ ! -f ~/templates/network_data.yaml ]; then
 		###################################
 		# ln -s /data/nfs/openstack/tripleo/templates . || abort "templates symlink err"
-		ln -s `dirname $0`/../ templates ~/ || abort "templates symlink err"
-		abort "~/templates/network_data.yaml not found.."
+		echo ".. symlinking in ~/templates"
+		( cd `dirname $0`/.. && P="`pwd`"
+		  cd ~/ ; ln -s $P/templates . )
+		[  -f ~/templates/network_data.yaml ] || abort "~/templates/network_data.yaml not found.."
+		ls -ld ~/templates
 	fi
 
 if [ ! -f ~/.overcloud.end ]; then	
