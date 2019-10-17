@@ -44,7 +44,7 @@ if [ ! -f /home/stack/operator.test.rc ]; then
 	openstack security group create open_ssh
 	openstack security group rule create open_ssh --dst-port 22
 	openstack security group rule create open_ssh --protocol icmp
-	openstack keypair create --private-key .ssh/cloud-user.priv cloud-user
+	openstack keypair create --private-key ~/.ssh/cloud-user.priv cloud-user
 	chmod 600 .ssh/cloud-user.priv 
 	################################################################
 	openstack network create internal
