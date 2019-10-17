@@ -1,7 +1,7 @@
 #!/bin/bash
 BASEDIR="`( cd $(dirname $0)/.. && pwd )`"
 echo "BASEDIR=[$BASEDIR]"
-. ${BASE_DIR}/bin/prompt.inc || exit 1
+. ${BASEDIR}/bin/prompt.inc || exit 1
 
 CHECK="`/usr/bin/whoami`.`/usr/bin/hostname -s`"
 [ "x$CHECK" = "xstack.undercloud" ] || abort "CHECK=[$CHECK]"
@@ -125,7 +125,7 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	fi
 	
 	### --------------- (start CEPH) -------------
-	if [ "x$CEPH" = "y" ]; then
+	if [ "x$CEPH" = "xy" ]; then
 	
 		if [ ! -f /home/stack/ceph_overcloud_images_environment.yaml ]; then
 			prompt "image prepare .."
