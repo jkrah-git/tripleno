@@ -1,0 +1,63 @@
+####################################################
+# NEW -----------------
+# eth0: PROV (101) +
+# - name: External  	vlan: 10	ip_subnet: '172.16.210.0/24'
+# - name: Storage	vlan: 12	ip_subnet: '172.16.212.0/24'
+# 
+# eth1:
+# - name: InternalApi  	vlan: 13	ip_subnet: '172.16.213.0/24'
+# - name: StorageMgmt	vlan: 14	ip_subnet: '172.16.214.0/24'
+# - name: Management	vlan: 15	ip_subnet: '10.0.1.215/24'
+# 
+# eth2:
+# - name: Tenant		vlan: 16	ip_subnet: '172.16.216.0/24'
+# 
+####################################################
+- name: External
+  name_lower: external
+  vip: true
+  vlan: 10
+  ip_subnet: '172.16.210.0/24'
+  allocation_pools: [{'start': '172.16.210.32', 'end': '172.16.210.200'}]
+  gateway_ip: '172.16.210.1'
+
+- name: Storage
+  name_lower: storage
+  vip: true
+  vlan: 12
+  ip_subnet: '172.16.212.0/24'
+  allocation_pools: [{'start': '172.16.212.32', 'end': '172.16.212.63'}]
+
+#########
+- name: InternalApi
+  name_lower: internal_api
+  vip: true
+  vlan: 13
+  ip_subnet: '172.16.213.0/24'
+  allocation_pools: [{'start': '172.16.213.32', 'end': '172.16.213.63'}]
+
+- name: StorageMgmt
+  name_lower: storage_mgmt
+  vip: true
+  vlan: 14
+  ip_subnet: '172.16.214.0/24'
+  allocation_pools: [{'start': '172.16.214.32', 'end': '172.16.214.63'}]
+
+- name: Management
+  name_lower: management
+  # Management network is enabled by default for backwards-compatibility, but
+  # is not included in any roles by default. Add to role definitions to use.
+  enabled: true
+  vip: false  # Management network does not use VIPs
+  vlan: 15
+  ip_subnet: '172.16.215.0/24'
+  allocation_pools: [{'start': '172.16.215.32', 'end': '172.16.215.63'}]
+
+- name: Tenant
+  name_lower: tenant
+  vip: false  # Tenant network does not use VIPs
+  vlan: 16
+  ip_subnet: '172.16.216.0/24'
+  allocation_pools: [{'start': '172.16.216.32', 'end': '172.16.216.63'}]
+
+####################################################

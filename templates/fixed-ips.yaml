@@ -1,0 +1,97 @@
+parameter_defaults:
+
+  HostnameMap:
+    overcloud-novacompute-0: compute0
+    overcloud-novacompute-1: compute1
+    overcloud-controller-0: controller0
+    overcloud-controller-1: controller1
+    overcloud-controller-2: controller2
+
+  ControlFixedIPs: [{'ip_address':'10.10.1.8'}]
+  PublicVirtualFixedIPs: [{'ip_address':'172.16.210.8'}]
+  StorageVirtualFixedIPs: [{'ip_address':'172.16.212.8'}]
+  InternalApiVirtualFixedIPs: [{'ip_address':'172.16.213.8'}]
+  StorageMgmtVirtualFixedIPs: [{'ip_address':'172.16.214.8'}]
+  RedisVirtualFixedIPs: [{'ip_address':'172.16.213.7'}]
+
+
+  ControllerIPs:
+    # Each controller will get an IP from the lists below, first controller, first IP
+    external:
+    - 172.16.210.10
+    - 172.16.210.11
+    - 172.16.210.12
+    storage:
+    - 172.16.212.10
+    - 172.16.212.11
+    - 172.16.212.12
+    internal_api:
+    - 172.16.213.10
+    - 172.16.213.11
+    - 172.16.213.12
+    storage_mgmt:
+    - 172.16.214.10
+    - 172.16.214.11
+    - 172.16.214.12
+    tenant:
+    - 172.16.216.10
+    - 172.16.216.11
+    - 172.16.216.12
+    management:
+    - 172.16.215.10
+    - 172.16.215.11
+    - 172.16.215.12
+  ComputeIPs:
+    # Each compute will get an IP from the lists below, first compute, first IP
+    internal_api:
+    - 172.16.213.20
+    - 172.16.213.21
+    - 172.16.213.22
+    storage:
+    - 172.16.212.20
+    - 172.16.212.21
+    - 172.16.212.22
+    tenant:
+    - 172.16.216.20
+    - 172.16.216.21
+    - 172.16.216.22
+    management:
+    - 172.16.215.20
+    - 172.16.215.21
+    - 172.16.215.22
+#
+  CephStorageIPs:
+    # Each ceph node will get an IP from the lists below, first node, first IP
+    storage:
+    - 172.16.212.30
+    - 172.16.212.31
+    - 172.16.212.32
+    storage_mgmt:
+    - 172.16.214.30
+    - 172.16.214.31
+    - 172.16.214.32
+    management:
+    - 172.16.215.30
+    - 172.16.215.31
+    - 172.16.215.32
+
+#  SwiftStorageIPs:
+#    # Each swift node will get an IP from the lists below, first node, first IP
+#    internal_api:
+#    - 172.16.2.254
+#    storage:
+#    - 172.16.1.254
+#    storage_mgmt:
+#    - 172.16.3.254
+#    #management:
+#    #- 172.16.4.254
+#  BlockStorageIPs:
+#    # Each cinder node will get an IP from the lists below, first node, first IP
+#    internal_api:
+#    - 172.16.2.250
+#    storage:
+#    - 172.16.1.250
+#    storage_mgmt:
+#    - 172.16.3.250
+#    #management:
+#    #- 172.16.4.250

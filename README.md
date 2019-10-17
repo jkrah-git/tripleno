@@ -1,0 +1,69 @@
+# tripleNo
+## undercloud - new vm
+```
+virt-install --connect qemu:///system --vnc --vnclisten=0.0.0.0 \
+-r 32768 --vcpus=16 \
+--disk pool=NFS_TANGO,size=40,format=qcow2 \
+--network=bridge=br0 \
+--network=bridge=br5 \
+--network=bridge=br4 \
+--location=nfs:cirrus:/data/centos7/  \
+--extra-args "inst.ks=http://kickstart.shopsmart.au.nu/cgi-bin/ks.cgi?HOSTNAME=undercloud&TEMPLATE=centos7" \
+--name undercloud
+```
+
+## configure br-ex (eth2)
+```
+cp -p /data/nfs/openstack/tripleo/undercloud/{ifcfg-eth2,ifcfg-br-ex} /etc/sysconfig/network-scripts/
+```
+
+## undercloud prep (root)
+* configs: eth1 (provisioning NIC)
+* installs python2-tripleo-repos.rpm
+```
+# run as 'root' user 
+undercloud/undercloud.sh
+reboot
+```
+
+## undercloud install (stack)
+* installs undercloud
+* upload (local) ironic-agent and overcloud-full images
+```
+## run as 'stack' user
+undercloud/undercloud.sh undercloud
+undercloud/undercloud.sh images
+
+```
+## prepare for overcloud image download
+* add inscure reg to docker  (--insecure-registry 10.10.1.5:5000 )
+* then reboot : update stack user perms / restart docker / brings up br-ex
+```
+sudo vi /etc/sysconfig/docker
+sudo reboot
+```
+## get overcloud images
+```
+# run as 'stack' user
+undercloud/undercloud.sh download
+```
+
+## covercloud config
+```
+cat > ~/.overcloud.conf  <<EOF
+## take 2 - 3 controllers
+export EXT_NIC=eth2
+export EXT_BR=br-ex
+export EXT_VLAN=10
+export EXT_GW=172.16.210.1
+
+export DOMS="controller0 controller1 controller2 compute0 compute1"
+export ANSWER_FILE=templates/answers/3-controller.yaml
+EOF
+```
+
+## install overcloud
+```
+overcloud/overcloud.sh
+
+```

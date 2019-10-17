@@ -1,0 +1,18 @@
+parameter_defaults:
+  OvercloudControllerFlavor: control
+  OvercloudComputeFlavor: compute
+  ControllerCount: 1
+  ComputeCount: 1
+ # NeutronBridgeMappings: "datacentre:br-ex"
+ # NeutronFlatNetworks: "datacentre,br-ex"
+  NeutronPublicInterface: 'eth1'
+#  HypervisorNeutronPublicInterface: 'eth1'
+ # IronicDefaultNetworkInterface: 'br-prov'
+  TimeZone: 'Australia/Sydney'
+  ExternalNetEnableDHCP: true
+
+  ControllerIPs:
+    external:
+    - 172.16.100.8 
+    - 172.16.100.9 
+    - 172.16.100.10 

@@ -1,0 +1,26 @@
+parameter_defaults:
+#  CephAnsibleDisksConfig:
+#    devices:
+#    - /dev/vdb
+#    - /dev/vdc
+#    - /dev/vdd
+
+
+  CephPoolDefaultSize: 1
+  CephPoolDefaultPgNum: 64
+  CephAnsiblePlaybookVerbosity: 1
+  CephAnsibleEnvironmentVariables:
+    ANSIBLE_SSH_RETRIES: '6'
+  CephAnsiblePlaybook: /usr/share/ceph-ansible/site-docker.yml.sample
+  CephAnsibleDisksConfig:
+    devices:
+      - /dev/vdb
+      - /dev/vdc
+    dedicated_devices:
+      - /dev/vdd
+    journal_size: 5120
+  CephAnsibleExtraConfig:
+    osd_scenario: non-collocated
+    osd_objectstore: filestore
+    ceph_osd_docker_memory_limit: 5g
+    ceph_osd_docker_cpu_limit: 1

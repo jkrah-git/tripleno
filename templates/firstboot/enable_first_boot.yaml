@@ -1,0 +1,2 @@
+resource_registry:
+  OS::TripleO::NodeUserData: first_boot.yaml

@@ -1,0 +1,13 @@
+{
+  "nodes": [
+      {
+        "mac": [ "__MAC__" ],
+        "name": "__NAME__",
+        "pm_port": "__PORT__",
+        "pm_type": "pxe_ipmitool",
+        "pm_user": "admin",
+        "pm_password": "password",
+        "pm_addr": "__HOST__"
+      }
+  ]
+}

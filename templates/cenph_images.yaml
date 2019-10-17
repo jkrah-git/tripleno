@@ -1,0 +1,9 @@
+# Generated with the following on 2019-09-30T20:06:25.960997
+#
+#   openstack overcloud container image prepare --namespace=docker.io/tripleoqueens -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml --push-destination=172.16.101.10:8787 --tag-from-label {version}-{release} --output-env-file=/home/stack/templates/cenph_images.yaml --output-images-file /home/stack/local_ceph_images.yaml
+#
+
+parameter_defaults:
+  DockerCephDaemonImage: 172.16.101.10:8787/ceph/daemon:v3.2.1-stable-3.2-luminous-centos-7-x86_64
+  DockerInsecureRegistryAddress:
+  - 172.16.101.10:8787

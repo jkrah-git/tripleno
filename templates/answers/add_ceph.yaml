@@ -1,0 +1,13 @@
+templates: /home/stack/rendered
+environments:
+  - rendered/environments/ceph-ansible/ceph-ansible.yaml
+  - rendered/environments/network-isolation.yaml
+  - rendered/environments/network-environment.yaml
+  - rendered/environments/net-single-nic-with-vlans.yaml
+  - rendered/environments/ips-from-pool-all.yaml
+  - rendered/environments/ssl/inject-trust-anchor.yaml
+  - templates/firstboot/enable_first_boot.yaml
+  - templates/ceph-config.yaml
+  - templates/ips-10.x.yaml
+  - templates/node-info.yaml
+  - templates/overcloud_images.yaml

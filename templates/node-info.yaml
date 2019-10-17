@@ -1,0 +1,13 @@
+parameter_defaults:
+  NtpServer: ['10.10.1.1']
+  TimeZone: 'Australia/Sydney'
+  OvercloudControllerFlavor: control
+  OvercloudComputeFlavor: compute
+  OvercloudCephStorageFlavor: ceph-storage
+  ControllerCount: 3
+  ComputeCount: 2
+  CephStorageCount: 0
+  NeutronEnableIsolatedMetadata: true
+  ControllerExtraConfig:
+    neutron::agents::dhcp::enable_isolated_metadata: true
+

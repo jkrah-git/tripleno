@@ -1,0 +1,6 @@
+parameter_defaults:
+  SSLRootCertificate: |
+%%CERT%%
+
+resource_registry:
+  OS::TripleO::NodeTLSCAData: ../../puppet/extraconfig/tls/ca-inject.yaml
