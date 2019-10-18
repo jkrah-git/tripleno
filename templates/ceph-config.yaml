@@ -18,6 +18,7 @@ parameter_defaults:
       - /dev/vdc
     dedicated_devices:
       - /dev/vdd
+      - /dev/vdd
     journal_size: 5120
   CephAnsibleExtraConfig:
     osd_scenario: non-collocated
