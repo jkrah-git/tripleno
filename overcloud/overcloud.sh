@@ -126,7 +126,9 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	
 	### --------------- (start CEPH) -------------
 	if [ "x$CEPH" = "xy" ]; then
-	
+	## make the same as undercloud.sh
+	DOCKER_DEST=10.10.1.5:5000
+
 		if [ ! -f /home/stack/ceph_overcloud_images_environment.yaml ]; then
 			prompt "image prepare .."
 			set -x
