@@ -126,17 +126,16 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	
 	### --------------- (start CEPH) -------------
 	if [ "x$CEPH" = "xy" ]; then
-		# check ansible is 2.6 and 'ceph-ansible.rpm' installed
-		ANSVER="$(ansible --version | awk '/^ansible/ { print $2 }')"
-		echo "ANSVER=[$ANSVER]"
-		[ "x$ANSVER" = "x2.6.17" ] || abort "ansiblever needs to be 2.6.17"
-		rpm -q ceph-ansible || abort "ceph-ansible not installed"
-
-
 		## make the same as undercloud.sh
 		DOCKER_DEST=10.10.1.5:5000
 		echo "DOCKER_DEST=[$DOCKER_DEST]"
 		if [ ! -f /home/stack/ceph_overcloud_images_environment.yaml ]; then
+
+			# check ansible is 2.6 and 'ceph-ansible.rpm' installed
+			ANSVER="$(ansible --version | awk '/^ansible/ { print $2 }')"
+			echo "ANSVER=[$ANSVER]"
+			[ "x$ANSVER" = "x2.6.17" ] || abort "ansiblever needs to be 2.6.17"
+			rpm -q ceph-ansible || abort "ceph-ansible not installed"
 			prompt "image prepare .."
 			set -x
 	openstack overcloud container image prepare  --namespace=docker.io/tripleo$OSDIST \
@@ -154,6 +153,7 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 		 	set -x
 		 	openstack overcloud container image upload  --config-file  /home/stack/ceph_local_registry_images.yaml --verbose
 		 	set +x
+			touch /home/stack/.ceph_overcloud_images_environment.downloaded
 		fi
 	fi
 	### --------------- (end CEPH) -------------
