@@ -14,7 +14,7 @@ virt-install --connect qemu:///system --vnc --vnclisten=0.0.0.0 \
 
 ## configure br-ex (eth2)
 ```
-cp -p undercloud/{ifcfg-eth2,ifcfg-br-ex} /etc/sysconfig/network-scripts/
+/bin/cp -p undercloud/{ifcfg-eth2,ifcfg-br-ex,ifcfg-vlan10} /etc/sysconfig/network-scripts/
 ```
 
 ## undercloud prep (root)
