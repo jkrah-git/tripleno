@@ -1,4 +1,5 @@
 parameter_defaults:
+  CephAnsiblePlaybookVerbosity: 1
   CephAnsibleDisksConfig:
     devices:
       - /dev/vdb
