@@ -1,5 +1,6 @@
 templates: /home/stack/rendered
 environments:
+  - rendered/environments/disable-telemetry.yaml
   - rendered/environments/network-isolation.yaml
   - rendered/environments/network-environment.yaml
   - rendered/environments/net-single-nic-with-vlans.yaml
