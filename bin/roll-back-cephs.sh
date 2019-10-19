@@ -19,7 +19,7 @@ for DOM in ceph0 ceph1 ceph2; do
 /bin/rm ${BASEDIR}/data/xml/${DOM}.xml
 /bin/rm ${BASEDIR}/data/json/${DOM}.json
 virsh undefine --remove-all-storage ${DOM}
-${BASEDIR}/bin/vm-ctl.sh mkdisk ${DOM} "50G 20G 20G 10G"
+${BASEDIR}/bin/vm-ctl.sh mkdisk ${DOM} "50G 20G 20G 20G"
 ${BASEDIR}/bin/vm-ctl.sh mkxml ${DOM} 'br5 br6 br7 br4' 8 17000
 done
 
