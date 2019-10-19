@@ -3,3 +3,4 @@ rendered.base/*
 images/*
 data/xml/*
 data/json/*
+logs/*
