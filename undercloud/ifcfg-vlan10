@@ -1,0 +1,17 @@
+ONBOOT=yes
+HOTPLUG=no
+NM_CONTROLLED=no
+PEERDNS=no
+
+DEVICE=vlan10
+DEVICETYPE=ovs
+TYPE=OVSIntPort
+OVS_BRIDGE=br-ex
+OVS_OPTIONS="tag=10"
+
+
+MTU=1500
+BOOTPROTO=static
+IPADDR=172.16.210.1 
+NETMASK=255.255.255.0
+# OVS_EXTRA="set bridge br-ctlplane other-config:hwaddr=52:54:00:80:e3:5d -- br-set-external-id br-ctlplane bridge-id br-ctlplane -- set bridge br-ctlplane fail_mode=standalone -- del-controller br-ctlplane -- set bridge br-ctlplane fail_mode=standalone -- del-controller br-ctlplane"
