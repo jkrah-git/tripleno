@@ -11,15 +11,15 @@ prompt()
 	
         [ -z "$SKIP_PROMPT" ] || return
 
-	while [ 1 ]; do
- 	       echo -n "Confirm(y/n/A) ?"
- 	       read CH
- 	       if [ "x$CH" = "xA" ]; then
- 	               SKIP_PROMPT=y
- 	               return
- 	       fi
- 	       [ "x$CH" = "xn" ] && abort "cancelled by user"
- 	       [ "x$CH" = "xy" ] && return
-	done
+    while [ 1 ]; do
+	echo -n "Confirm(y/n/A) ?"
+	read CH
+	[ -z "$CH" ] && sleep 1
+	[ -z "$CH" ] && continue
+	[ "$CH" = "y" ] && return
+	[ "$CH" = "n" ] && abort "cancelled by user"
+	[ "$CH" = "A" ] && break  
+    done
+	export SKIP_PROMPT=y
 }
 
