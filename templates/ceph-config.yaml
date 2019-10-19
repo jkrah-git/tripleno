@@ -1,5 +1,7 @@
 parameter_defaults:
-  CephAnsiblePlaybookVerbosity: 1
+  CephAnsiblePlaybookVerbosity: 2
+
+  CephPoolDefaultPgNum: 64
   CephAnsibleDisksConfig:
     devices:
       - /dev/vdb
