@@ -8,7 +8,7 @@ echo "BASEDIR=[$BASEDIR]"
 
 CHECK="`/usr/bin/whoami`.`/usr/bin/hostname -s`"
 [ "x$CHECK" = "xstack.undercloud" ] || abort "CHECK=[$CHECK]"
-
+prompt "build test env ?"
 if [ ! -f /home/stack/operator.test.rc ]; then
 	## END (CONTROLLER)
 	#########################################################################################################
