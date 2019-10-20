@@ -62,13 +62,24 @@ startup_list()
 		echo ":up"
 	done
 
-	print "waiting for ntp (retry every 10sec)"
+	print "waiting for ntp (retry every 10sec) client restart every 10 fails"
 	for N in $LIST; do
+		let C=0
 		while [ 1 ]; do
 			H="`echo $N | sed -e 's|overcloud-cephstorage-|cephstorage|g'`"
 			NTPREF="$(ssh heat-admin@$H /sbin/ntpq -pn | tail -1 | awk '{ print $1 }' 2>&1)"
 			echo "$N: $NTPREF"
 			[ "x$NTPREF" = 'x*10.10.1.1' ]  && break
+			let C=$C+1
+			if [ $C -gt 9 ]; then
+				print "restarting rmeote (ntp) client.."
+				set -x
+				ssh heat-admin@${H} 'sudo systemctl stop ntpd'
+				ssh heat-admin@${H} 'sudo ntpdate -d -q 10.10.1.1'
+				ssh heat-admin@${H} 'sudo systemctl start ntpd'
+				set +x
+				let C=0
+			fi
 			sleep 10
 		done
 	done
@@ -179,6 +190,15 @@ full_startup()
 	print "STORAGE=[$STORAGE]"
 	prompt "START Overcloud ?"
 
+	print "checking local NTP..(every 30s) (can reuire 20mins uptime)"
+	while [ 1 ]; do
+		echo -n "Uptime[`uptime`] : local NTP LEAP="
+		LOCAL_LEAP="$(ntpdate -d 10.10.1.1 2>&1 | grep ^stratum | sed -e 's|.*leap \([0-9]*\).*|\1|g')"
+		echo "[$LOCAL_LEAP]"
+		[ "x$LOCAL_LEAP" = "x00" ] && break
+		sleep 30
+	done
+
 	if [ -z "$1" ] || [ "$1" = "control" ]; then
 		prompt "start control nodes[$CONTROL]"
 		startup_list "$CONTROL"
@@ -194,7 +214,7 @@ full_startup()
 		startup_list "$COMPUTE"
 	fi
 
-
+    if [ ! -z "$STORAGE" ]; then
 	print "waiting for ceph to come good"
 	for N in $CONTROL; do
 		pingtest $N 
@@ -209,9 +229,10 @@ full_startup()
 			break
 		fi
 	done
+    fi
 
-	print "wating 60 sec before final pcs cleanup"
-	#wait 30
+	print "pcs cleanup.. in 10sec"
+	wait 10
 	for N in $CONTROL; do
 		set -x
 		ssh heat-admin@${N} 'sudo pcs resource cleanup'
