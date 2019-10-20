@@ -7,6 +7,9 @@ CONF=~/.overcloud.conf
 print "BASEDIR=[$BASEDIR] CONF=[$CONF]"
 . $CONF || abort "CONF[$CONF] not found"
 
+CMD="`basename $0`"
+print "CMD=[$CMD]"
+
 . ~stack/stackrc || abort "stackrc err"
 
 STATE=~/.servers.txt
@@ -97,29 +100,29 @@ shutdown_list()
 }
 
 
-CHECK="`/usr/bin/whoami`.`/usr/bin/hostname -s`"
-[ "x$CHECK" = "xstack.undercloud" ] || abort "CHECK=[$CHECK]"
-CMD="`basename $0`"
-print "CMD=[$CMD]"
-
 
 ##################################### SHUTDOWN
-if [ "$CMD" = "shutdown.sh" ] ; then
+full_shutdown()
+{
+#if [ "$CMD" = "shutdown.sh" ] ; then
 	CONTROL="$(cat $STATE | awk -F, '/,"control"$/ { print $2 }' | sed -e 's/"//g; s/\n/ /g' | sort -r | tr '\n' ' ')"
 	COMPUTE="$(cat $STATE | awk -F, '/,"compute"$/ { print $2 }' | sed -e 's/"//g; s/\n/ /g' | sort -r | tr '\n' ' ')"
 	STORAGE="$(cat $STATE | awk -F, '/,"ceph-storage"$/ { print $2 }' | sed -e 's/"//g; s/\n/ /g' | sort -r | tr '\n' ' ')"
 	print "CONTROL=[$CONTROL]"
 	print "COMPUTE=[$COMPUTE]"
 	print "STORAGE=[$STORAGE]"
-	prompt "Really Shutdown OVERCLOUD ?"
+	prompt "STOP Overcloud ?"
 	
 	if [ -z "$1" ] || [ "$1" = "servers" ]; then
 		. ~stack/overcloudrc || abort "~stack/overcloudrc err"
-		prompt "delete running instances.."
-		print "geting list.."
-		openstack server list --all-projects -f value -c ID -c Name | while read LINE; do
+		prompt "delete ALL running 'instances'.."
+		print "checking for running 'instances'.."
+		openstack server list --all-projects -f value -c ID -c Name -c Status | while read LINE; do
 			ID="`echo $LINE | awk '{ print $1 }'`"
 			NAME="`echo $LINE | awk '{ print $2 }'`"
+			STATE="`echo $LINE | awk '{ print $3 }'`"
+			echo "$NAME [$ID] is STATE[$STATE]"
+			[ "x$STATE" = "xACTIVE" ] || continue
 			[ -z "$ID" ] && continue
 			print "delete instance[$NAME,$ID]..."
 			set -x
@@ -127,7 +130,7 @@ if [ "$CMD" = "shutdown.sh" ] ; then
 			set +x
 		done
 	fi
-	
+
 	if [ -z "$1" ] || [ "$1" = "compute" ]; then
 		prompt "shutdown compute nodes [$COMPUTE]"
 		shutdown_list "$COMPUTE"
@@ -144,7 +147,7 @@ if [ "$CMD" = "shutdown.sh" ] ; then
 			pingtest $N 
 			if [ $? -eq 0 ]; then
 				print "controller[$N] is up.."
-				ssh heat-admin@controller1 '/usr/bin/sudo /sbin/pcs cluster status' 
+				ssh heat-admin@${N} '/usr/bin/sudo /sbin/pcs cluster status' 
 				if [ $? -eq 0 ]; then
 					set -x
 					ssh heat-admin@${N} '/usr/bin/sudo /sbin/pcs cluster stop --all'
@@ -161,17 +164,21 @@ if [ "$CMD" = "shutdown.sh" ] ; then
 		shutdown_list "$CONTROL"
 	
 	fi
-	exit 0
-fi
+	#exit 0
+#fi
+}
 ##################################### STARTUP
-if [ "$CMD" = "startup.sh" ]; then
+full_startup()
+{
+#if [ "$CMD" = "startup.sh" ]; then
 	CONTROL="$(cat $STATE | awk -F, '/,"control"$/ { print $2 }' | sed -e 's/"//g' | sort | tr '\n' ' ')"
 	COMPUTE="$(cat $STATE | awk -F, '/,"compute"$/ { print $2 }' | sed -e 's/"//g' | sort | tr '\n' ' ')"
 	STORAGE="$(cat $STATE | awk -F, '/,"ceph-storage"$/ { print $2 }' | sed -e 's/"//g' | sort | tr '\n' ' ')"
 	print "CONTROL=[$CONTROL]"
 	print "COMPUTE=[$COMPUTE]"
 	print "STORAGE=[$STORAGE]"
-	
+	prompt "START Overcloud ?"
+
 	if [ -z "$1" ] || [ "$1" = "control" ]; then
 		prompt "start control nodes[$CONTROL]"
 		startup_list "$CONTROL"
@@ -187,6 +194,44 @@ if [ "$CMD" = "startup.sh" ]; then
 		startup_list "$COMPUTE"
 	fi
 
-	exit 0
-fi
+
+	print "waiting for ceph to come good"
+	for N in $CONTROL; do
+		pingtest $N 
+		if [ $? -eq 0 ]; then
+			print "controller[$N] is up.."
+			while [ 1 ]; do
+				CEPH_HEALTH=$(ssh heat-admin@${N} 'sudo docker exec ceph-mon-$HOSTNAME ceph health')
+				echo "[$N]: CEPH_HEALTH=[$CEPH_HEALTH]"
+				[ "$CEPH_HEALTH" = "HEALTH_OK" ] && break
+				wait 15
+			done
+			break
+		fi
+	done
+
+	print "wating 60 sec before final pcs cleanup"
+	#wait 30
+	for N in $CONTROL; do
+		set -x
+		ssh heat-admin@${N} 'sudo pcs resource cleanup'
+		set +x
+	done
+
+
+	#exit 0
+#fi
+}
 ##################################### STARTUP
+
+let START_TIME=`date +%s`
+
+[ "$CMD" = "startup.sh" ] && full_startup
+[ "$CMD" = "shutdown.sh" ] && full_shutdown
+
+let END_TIME=`date +%s`
+
+let TOTAL_TIME=$END_TIME-$START_TIME
+let TOTAL_MIN=$TOTAL_TIME/60
+print "finished [$CMD] in $TOTAL_TIME (sec) (aprox $TOTAL_MIN min)"
+

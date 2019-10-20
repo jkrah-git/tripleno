@@ -32,7 +32,7 @@ wait()
 {
 	[ -z "$1" ] && return
 	let DELAY=$1 || return
-	echo -n `print "waiting [$DELAY]: ("`
+	echo -n "waiting [$DELAY]: ("
 	for I in `seq $DELAY -1 1`; do echo -n "$I "; sleep 1; done
 	echo "): Ok"
 }
