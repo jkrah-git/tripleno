@@ -23,3 +23,7 @@ prompt()
 	export SKIP_PROMPT=y
 }
 
+info()
+{
+	echo "`date +%H:%M:%S-%d.%m.%y`:[$0]: $*"
+}
