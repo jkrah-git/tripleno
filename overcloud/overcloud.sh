@@ -2,11 +2,17 @@
 BASEDIR="`( cd $(dirname $0)/.. && pwd )`"
 echo "BASEDIR=[$BASEDIR]"
 . ${BASEDIR}/bin/prompt.inc || exit 1
-
 CHECK="`/usr/bin/whoami`.`/usr/bin/hostname -s`"
 [ "x$CHECK" = "xstack.undercloud" ] || abort "CHECK=[$CHECK]"
-
 CONF=~/.overcloud.conf
+ . $CONF || abort "CONF[$CONF] not found"
+
+
+
+
+JSON_DIR="${BASEDIR}/data/json"
+[ -d "$JSON_DIR" ] || abort "JSON_DIR[$JSON_DIR] err"
+
 ## CONF should export the following
 ## EXT_BR= ovs-bridgle for External GW
 ## EXT_VLAN= VLAN id for External GW
@@ -24,7 +30,6 @@ CONF=~/.overcloud.conf
 #	ANSWER_FILE=templates/answers/add_ceph.yaml
 #	ANSWER_FILE=templates/answers/3-nodes.yaml
 	set -x
- . $CONF || abort "CONF[$CONF] not found"
 	set +x
 
 [ -z "$EXT_BR" ] && abort "EXT_BR external ovs-bridege NOT set"
@@ -37,8 +42,6 @@ CONF=~/.overcloud.conf
 EXT_IF=vlan${EXT_VLAN}
 
 
-JSON_DIR="`dirname $0`/../data/json"
-[ -d "$JSON_DIR" ] || abort "JSON_DIR[$JSON_DIR] err"
 
 prompt  "Install overcloud on to DOMS[$DOMS]"
 
