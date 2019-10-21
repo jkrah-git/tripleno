@@ -38,6 +38,11 @@ JSON_DIR="${BASEDIR}/data/json"
 [ -z "$EXT_NIC" ] && abort "EXT_NIC not set"
 [ -z "$DOMS" ] && abort "DOMS not set"
 [ -z "$ANSWER_FILE" ] && abort "ANSWER_FILE not set"
+## make the same as undercloud.sh
+# DOCKER_DEST=10.10.1.5:5000
+# OSDIST=queens
+[ -z "$DOCKER_DEST" ] && abort "DOCKER_DEST not set in config"
+[ -z "$OSDIST" ] && abort "OSDIST not set in config"
 
 EXT_IF=vlan${EXT_VLAN}
 
@@ -62,7 +67,7 @@ print "ARE NODE COUNTS CORRECT"
 prompt  "Install overcloud on to DOMS[$DOMS]"
 
 
-
+let START_TIME=`date +%s`
 ##############################################################################################################################
 ##############################################################################################################################
 ###################################
@@ -112,7 +117,7 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	prompt "continue (import [$DOMS]).."
 		###################################
 		for DOM in $DOMS; do
-			echo "importing overcloud node[$DOM]"
+			print "importing overcloud node[$DOM]"
 			#openstack baremetal node delete $DOM
 			set -x
 			openstack overcloud node import ${JSON_DIR}/${DOM}.json
@@ -125,7 +130,7 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	if [ ! -f ~/.inspected.nodes.txt ]; then
 	prompt "continue (inntrospect [$DOMS]).."
 		###################################
-		echo ".. insoecting nodes: "
+		print ".. insoecting nodes: "
 		set -x
 		openstack overcloud node introspect --all-manageable --provide
 		openstack overcloud profiles list > ~/.inspected.nodes.txt
@@ -141,30 +146,27 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 			echo $DOM | grep control && ROLE="control"
 			echo $DOM | grep ceph && ROLE="ceph-storage"
 
-			echo "importing overcloud node[$DOM] role[$ROLE]"
+			print "importing overcloud node[$DOM] role[$ROLE]"
 			if [ ! -z "$ROLE" ]; then
 			set -x
 				openstack baremetal node set --property capabilities="profile:$ROLE,boot_option:local" $DOM
 				[ "$ROLE" = "ceph-storage" ] && openstack baremetal node set --property root_device='{"name": "/dev/vda"}' $DOM
 			set +x
 			else
-				echo "ERR: Cant file role for [$DOM]"
+				abort "ERR: Cant file role for [$DOM]"
 			fi
 		done
 		openstack overcloud profiles list > ~/.bare.roles.txt
 	fi
 	
-	## make the same as undercloud.sh
-	DOCKER_DEST=10.10.1.5:5000
-	OSDIST=queens
-	echo "DOCKER_DEST=[$DOCKER_DEST]"
+	print "DOCKER_DEST=[$DOCKER_DEST] OSDIST[$OSDIST]"
 	### --------------- (start CEPH) -------------
 	if [ "x$CEPH" = "xy" ]; then
 		if [ ! -f /home/stack/ceph_overcloud_images_environment.yaml ]; then
 
 			# check ansible is 2.6 and 'ceph-ansible.rpm' installed
 			ANSVER="$(ansible --version | awk '/^ansible/ { print $2 }')"
-			echo "ANSVER=[$ANSVER]"
+			print "ANSVER=[$ANSVER]"
 			[ "x$ANSVER" = "x2.6.17" ] || abort "ansiblever needs to be 2.6.17"
 			rpm -q ceph-ansible || abort "ceph-ansible not installed"
 			prompt "(ceph) image prepare .."
@@ -223,7 +225,7 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 	if [ ! -f ~/templates/network_data.yaml ]; then
 		###################################
 		# ln -s /data/nfs/openstack/tripleo/templates . || abort "templates symlink err"
-		echo ".. symlinking in ~/templates"
+		print ".. symlinking in ~/templates"
 		( cd `dirname $0`/.. && P="`pwd`"
 		  cd ~/ ; ln -s $P/templates . )
 		[  -f ~/templates/network_data.yaml ] || abort "~/templates/network_data.yaml not found.."
@@ -240,19 +242,30 @@ if [ ! -f ~/.overcloud.end ]; then
 	###################################
 	
 	########### step 3. - inject interface files
-	# /bin/cp templates/ctl-eth0_brex-eth1/* rendered/network/config/single-nic-vlans/ || exit
-	# /bin/cp ~/templates/inject-trust-anchor.yaml ~/rendered/environments/ssl/inject-trust-anchor.yaml  || abort "cp err"
 	/bin/cp ~/templates/nics/current/* ~/rendered/network/config/single-nic-vlans/ || abort "cp err"
-	[ -z "$DOWNLOAD_OVN" ] || cp -p templates/nics/net-single-nic-with-vlans.yaml.ovn rendered/environments/net-single-nic-with-vlans.yaml
 
+	if [ ! -z "$DOWNLOAD_OVN" ]; then
+		#cp -p templates/nics/net-single-nic-with-vlans.yaml.ovn rendered/environments/net-single-nic-with-vlans.yaml
+		cp -p ~/rendered/network/config/single-nic-vlans/controller.yaml ~/rendered/network/config/single-nic-vlans/compute.yaml || abort 'overwrite comp nics for OVN failed'
+		grep OS::TripleO::Compute::Ports::ExternalPort rendered/environments/network-isolation.yaml || cat >> ~/rendered/environments/network-isolation.yaml << EOFextport 
+
+  # Externa/Compute Port assignment for OVN
+  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
+EOFextport
+	fi
 	`dirname $0`/../bin/insert-cert.sh > ~/rendered/environments/ssl/inject-trust-anchor.yaml  || abort "cert err"
 
 	##################################
+	let END_TIME=`date +%s`
+	let PREP_TIME=$END_TIME-$START_TIME
+	let PREP_MIN=$PREP_TIME/60
+	print "pre-deployedment PREP took ($PREP_TIME)s (aprox $PREP_MIN min)"
 
 	########### step 4. - run main install
+	
 	prompt "continue (main overcloud depploy ).."
-	echo 
-	echo "Finished aprox (`date +%r -d 'now + 5100 seconds'`)"
+	print 
+	print "Finished aprox (`date +%r -d 'now + 5100 seconds'`)"
 	for I in `seq 10 -1 1`; do echo -n "$I.. "; sleep 1; done; echo 
 
 	cd ~ || abort "cd err"
@@ -286,86 +299,3 @@ sed -i '9i-A INPUT -i vlan13 -p tcp --dport 11211  -m state --state NEW -m comme
 #######################
 EOinstallmsg
 
-exit 0
-
-
-
-if [ ! -f /home/stack/operator.test.rc ]; then
-	## END (CONTROLLER)
-	#########################################################################################################
-	################## default (br-ex:datacentre) provider network (currenlty br-ex=prov.i/f)
-	. overcloudrc || abort
-	set -x
-	openstack floating ip create external
-	## 172.16.101.208
-	
-	################## create project /users/roles
-	openstack project create test
-	openstack user create --project test --password architect architect
-	openstack role add  --project test --user architect  admin
-	
-	openstack user create --project test --password operator operator
-	openstack role add  --project test --user operator _member_
-	# /data/nfs/openstack/bin/keystone_rc.sh operator operator test > operator.test.rc
-	# /data/nfs/openstack/bin/keystone_rc.sh architect architect test > architect.test.rc
-	/data/nfs/openstack/tripleo/bin/keystone_rc.sh operator operator test > operator.test.rc
-	/data/nfs/openstack/tripleo/bin/keystone_rc.sh architect architect test > architect.test.rc
-	################## test users
-	. operator.test.rc || abort
-	openstack network list
-	. architect.test.rc  || abort
-	openstack network list
-	##################
-	
-	. architect.test.rc
-	openstack image create --file /data/nfs/openstack/images/CentOS-7-x86_64-GenericCloud.qcow2 --disk-format qcow2 centos7
-	openstack image create --file /data/nfs/openstack/images/cirros-0.3.5-x86_64-disk.img --disk-format qcow2 cirros
-	openstack flavor create --ram 8100 --disk 10 default
-	openstack floating ip create external
-	## 172.16.4.203
-	################################################################
-	. operator.test.rc 
-	openstack security group create open_ssh
-	openstack security group rule create open_ssh --dst-port 22
-	openstack security group rule create open_ssh --protocol icmp
-	openstack keypair create --private-key .ssh/cloud-user.priv cloud-user
-	chmod 600 .ssh/cloud-user.priv 
-	################################################################
-	. operator.test.rc 
-	openstack network create internal
-	openstack subnet create --network internal --subnet-range 10.0.0.0/24 --dhcp --allocation-pool start=10.0.0.32,end=10.0.0.64 --dns-nameserver 172.16.10.3 internal-subnet
-	openstack router create external-router
-	openstack router set --external-gateway external external-router
-	openstack router add subnet external-router internal-subnet
-	##########
-fi
-
-if [ ! -f "/home/stack/.neutron.ok" ]; then
-cat << EOF > /home/stack/.neutron.ok
-######### (START RUN ON CONTROLLER)
-##  enable_isolated_metadata=true ## shoould be ok ## CHECK: 
-grep ^enable_isolated_metadata=  /var/lib/config-data/puppet-generated/neutron/etc/neutron/dhcp_agent.ini
-
-docker exec -it nova_scheduler  nova-manage cell_v2 discover_hosts --verbose
-######### (END RUN ON CONTROLLER)
-EOF
-cat /home/stack/.neutron.ok
-exit 
-fi
-
-if [ ! -f "/home/stack/.server.ok" ]; then
-. ~/operator.test.rc || abort "~/operator.test.rc failed"
-set -x
-openstack server create --flavor default --key-name cloud-user --security-group open_ssh --wait --image centos7 --network external ext-server
-openstack server create --flavor default --key-name cloud-user --security-group open_ssh --wait --image centos7 --network internal int-server
-openstack floating ip list
-openstack server list
-echo \# openstack server add floating ip int-server X.X.X.X
-touch /home/stack/.server.ok
-fi
-
-
-
-exit
-openstack server delete int-server
-openstack server delete ext-server
