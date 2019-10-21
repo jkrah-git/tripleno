@@ -42,7 +42,12 @@ JSON_DIR="${BASEDIR}/data/json"
 EXT_IF=vlan${EXT_VLAN}
 
 
-
+print "ANSWER_FILE=[$ANSWER_FILE]"
+if [ -f $ANSWER_FILE ] ; then
+	echo "############################"
+	cat $ANSWER_FILE
+	echo "############################"
+fi
 prompt  "Install overcloud on to DOMS[$DOMS]"
 
 ##############################################################################################################################
@@ -51,8 +56,17 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 #if [ ! -f /home/stack/.servers.txt ]; then
 	########### (check) External vlan / external-gateway
 	# ifconfig vlan10 2> /dev/null 
+	if [ ! -f /etc/sysconfig/network-scripts/ifcfg-${EXT_IF} ]; then
+		print "WARN: ifcfg-${EXT_IF} does not exist"
+		if [ -f ${BASEDIR}/undercloud/ifcfg-${EXT_IF} ]; then 
+			print "copiying ${BASEDIR}/undercloud/ifcfg-${EXT_IF}  to /etc/sysconfig/network-scripts/"
+			sudo cp -p ${BASEDIR}/undercloud/ifcfg-${EXT_IF} /etc/sysconfig/network-scripts/ || abort "cp err"
+		fi
+	fi
+
 	ifconfig ${EXT_IF}  2> /dev/null 
 	if [ $? -ne 0 ]; then
+		print "manually bringin up $EXT_IF"
 		set -x
 		# sudo ovs-vsctl add-port $BR vlan10 -- set Interface vlan10 type=internal
 		sudo ovs-vsctl add-port $EXT_BR ${EXT_IF} -- set Interface ${EXT_IF} type=internal
