@@ -48,7 +48,20 @@ if [ -f $ANSWER_FILE ] ; then
 	cat $ANSWER_FILE
 	echo "############################"
 fi
+
+TDIR=$BASEDIR/templates
+[ -d ~/templates ] && TDIR=~/templates
+
+if [ -f $TDIR/node-info.yaml ]; then
+	grep Count $TDIR/node-info.yaml
+else 
+	print "WARN: Cant preview nodef-info.yaml"
+fi
+print "ARE NODE COUNTS CORRECT"
+
 prompt  "Install overcloud on to DOMS[$DOMS]"
+
+
 
 ##############################################################################################################################
 ##############################################################################################################################
