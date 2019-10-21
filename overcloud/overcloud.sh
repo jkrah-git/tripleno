@@ -243,6 +243,8 @@ if [ ! -f ~/.overcloud.end ]; then
 	# /bin/cp templates/ctl-eth0_brex-eth1/* rendered/network/config/single-nic-vlans/ || exit
 	# /bin/cp ~/templates/inject-trust-anchor.yaml ~/rendered/environments/ssl/inject-trust-anchor.yaml  || abort "cp err"
 	/bin/cp ~/templates/nics/current/* ~/rendered/network/config/single-nic-vlans/ || abort "cp err"
+	[ -z "$DOWNLOAD_OVN" ] || cp -p templates/nics/net-single-nic-with-vlans.yaml.ovn rendered/environments/net-single-nic-with-vlans.yaml
+
 	`dirname $0`/../bin/insert-cert.sh > ~/rendered/environments/ssl/inject-trust-anchor.yaml  || abort "cert err"
 
 	##################################
