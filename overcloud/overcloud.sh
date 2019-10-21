@@ -141,11 +141,12 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 		openstack overcloud profiles list > ~/.bare.roles.txt
 	fi
 	
+	## make the same as undercloud.sh
+	DOCKER_DEST=10.10.1.5:5000
+	OSDIST=queens
+	echo "DOCKER_DEST=[$DOCKER_DEST]"
 	### --------------- (start CEPH) -------------
 	if [ "x$CEPH" = "xy" ]; then
-		## make the same as undercloud.sh
-		DOCKER_DEST=10.10.1.5:5000
-		echo "DOCKER_DEST=[$DOCKER_DEST]"
 		if [ ! -f /home/stack/ceph_overcloud_images_environment.yaml ]; then
 
 			# check ansible is 2.6 and 'ceph-ansible.rpm' installed
@@ -153,7 +154,7 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 			echo "ANSVER=[$ANSVER]"
 			[ "x$ANSVER" = "x2.6.17" ] || abort "ansiblever needs to be 2.6.17"
 			rpm -q ceph-ansible || abort "ceph-ansible not installed"
-			prompt "image prepare .."
+			prompt "(ceph) image prepare .."
 			set -x
 	openstack overcloud container image prepare  --namespace=docker.io/tripleo$OSDIST \
 	--push-destination=${DOCKER_DEST} \
@@ -174,6 +175,35 @@ prompt  "Install overcloud on to DOMS[$DOMS]"
 		fi
 	fi
 	### --------------- (end CEPH) -------------
+
+	if [ -z "$DOWNLOAD_OVN" ]; then
+		print "DOWNLOAD_OVN is NOT set.."
+	else
+		print "DOWNLOAD_OVN is SET.."
+		SRC_FILE=/usr/share/openstack-tripleo-heat-templates/environments/neutron-ml2-ovn-ha.yaml
+		REG_FILE=ovn_local_registry_images.yaml
+		ENV_FILE=ovn_overcloud_images_environment.yaml
+
+		if [ ! -f /home/stack/$REG_FILE ]; then
+			prompt "(ovn) image prepare .."
+			set -x
+			openstack overcloud container image prepare  --namespace=docker.io/tripleo$OSDIST \
+				--push-destination=${DOCKER_DEST} \
+				--tag-from-label {version}-{release} \
+				--output-env-file=/home/stack/${ENV_FILE} \
+				--output-images-file /home/stack/${REG_FILE} \
+				-e ${SRC_FILE}
+			set +x
+		fi
+
+		if [ ! -f /home/stack/.ovn_overcloud_images_environment.downloaded ]; then
+		 	prompt "(ovn) image download .."
+		 	set -x
+		 	openstack overcloud container image upload  --config-file  /home/stack/${REG_FILE} --verbose
+		 	set +x
+			touch /home/stack/.ovn_overcloud_images_environment.downloaded
+		fi
+	fi
 
 
 	###########  symlink templates/
