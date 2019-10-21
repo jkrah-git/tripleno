@@ -6,7 +6,7 @@ environments:
   - rendered/environments/ips-from-pool-all.yaml
   - rendered/environments/ssl/inject-trust-anchor.yaml
   - rendered/environments/docker-ha.yaml
-  - rendered/environments/neutron-ml2-ovn-ha.yaml
+  - rendered/environments/services-docker/neutron-ovn-dvr-ha.yaml
   - templates/firstboot/enable_first_boot.yaml
   - templates/fixed-ips.yaml
   - templates/node-info.yaml
