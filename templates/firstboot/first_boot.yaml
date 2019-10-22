@@ -16,7 +16,7 @@ resources:
       config: |
         #!/bin/bash
         echo "Welcome to myCloud" >> /etc/motd
-        echo centos |  passwd --stdin centos
+        echo heat-admin |  passwd --stdin heat-admin
 
 outputs:
   OS::stack_id:
