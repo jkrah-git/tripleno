@@ -16,6 +16,7 @@ resources:
       config: |
         #!/bin/bash
         echo "Welcome to myCloud" >> /etc/motd
+        echo centos |  passwd --stdin centos
 
 outputs:
   OS::stack_id:
