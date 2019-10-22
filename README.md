@@ -51,14 +51,17 @@ undercloud/undercloud.sh download
 ## covercloud config
 ```
 cat > ~/.overcloud.conf  <<EOF
-## take 2 - 3 controllers
+## OVN -take 1 
+export DOCKER_DEST=10.10.1.5:5000
+export OSDIST=queens
+#
 export EXT_NIC=eth2
 export EXT_BR=br-ex
 export EXT_VLAN=10
 export EXT_GW=172.16.210.1
-
 export DOMS="controller0 controller1 controller2 compute0 compute1"
-export ANSWER_FILE=templates/answers/3-controller.yaml
+export ANSWER_FILE=~/templates/answers/3-controller-ovn.yaml
+export DOWNLOAD_OVN=y
 EOF
 ```
 
