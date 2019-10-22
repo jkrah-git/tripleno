@@ -54,6 +54,8 @@ parameter_defaults:
     #- 172.16.4.251
   ComputeIPs:
     # Each compute will get an IP from the lists below, first compute, first IP
+    external:
+    - 10.0.0.252
     internal_api:
     - 172.16.2.252
     storage:
