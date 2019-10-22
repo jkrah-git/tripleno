@@ -43,7 +43,6 @@ parameter_defaults:
     - 172.16.215.12
   ComputeIPs:
     # Each compute will get an IP from the lists below, first compute, first IP
-    # should be able to remove 14/storage_mgmt
     external:
     - 172.16.210.20
     - 172.16.210.21
@@ -56,10 +55,10 @@ parameter_defaults:
     - 172.16.213.20
     - 172.16.213.21
     - 172.16.213.22
-    storage_mgmt:
-    - 172.16.214.20
-    - 172.16.214.21
-    - 172.16.214.22
+#   storage_mgmt:
+#   - 172.16.214.20
+#   - 172.16.214.21
+#   - 172.16.214.22
     tenant:
     - 172.16.216.20
     - 172.16.216.21
