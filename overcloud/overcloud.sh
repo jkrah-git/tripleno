@@ -232,7 +232,9 @@ let START_TIME=`date +%s`
 		ls -ld ~/templates
 	fi
 
-if [ ! -f ~/.overcloud.end ]; then	
+if [ ! -f ~/.overcloud.end ]; then
+	# Notes on rendering
+	# looks to assume: External IP  on provision netowrk - override with template
 	########### step 2. - (re)create rendered templates
 	prompt "continue (render templates [$DOMS]).."
 	[ -d ~/rendered ] && rm -rf ~/rendered
@@ -266,6 +268,7 @@ EOFextport
 	print "####################### DIFFS ##################"
 	set -x
 	diff -r ~/rendered.orig ~/rendered
+	set +x
 	prompt " ############ DIFF OK ?? ##############"
 
 
