@@ -62,7 +62,7 @@ parameters:
     description: The default route of the control plane network.
     type: string
   ExternalInterfaceDefaultRoute:
-    default: '172.16.100.32'
+    default: '172.16.210.1'
     description: default route for the external network
     type: string
   DnsServers: # Override this via parameter_defaults

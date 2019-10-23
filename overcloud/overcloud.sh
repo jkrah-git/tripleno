@@ -236,9 +236,11 @@ if [ ! -f ~/.overcloud.end ]; then
 	########### step 2. - (re)create rendered templates
 	prompt "continue (render templates [$DOMS]).."
 	[ -d ~/rendered ] && rm -rf ~/rendered
+	[ -d ~/rendered.orig ] && rm -rf ~/rendered.orig
 	/usr/share/openstack-tripleo-heat-templates/tools/process-templates.py \
 	-p /usr/share/openstack-tripleo-heat-templates/ \
 	-o ~/rendered  -n ~/templates/network_data.yaml
+	cp -pr ~/rendered ~/rendered.orig 
 	###################################
 	
 	########### step 3. - inject interface files
@@ -257,7 +259,15 @@ if [ ! -f ~/.overcloud.end ]; then
   OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
 EOFextport
 	fi
+
 	`dirname $0`/../bin/insert-cert.sh > ~/rendered/environments/ssl/inject-trust-anchor.yaml  || abort "cert err"
+
+
+	print "####################### DIFFS ##################"
+	set -x
+	diff -r ~/rendered.orig ~/rendered
+	prompt " ############ DIFF OK ?? ##############"
+
 
 	##################################
 	let END_TIME=`date +%s`
