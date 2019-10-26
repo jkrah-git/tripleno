@@ -258,7 +258,8 @@ if [ ! -f ~/.overcloud.end ]; then
 		grep OS::TripleO::Compute::Ports::ExternalPort ~/rendered/environments/network-isolation.yaml || cat >> ~/rendered/environments/network-isolation.yaml << EOFextport 
 
   # Externa/Compute Port assignment for OVN
-  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
+  # OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
+  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external_from_pool.yaml
 EOFextport
 	fi
 
