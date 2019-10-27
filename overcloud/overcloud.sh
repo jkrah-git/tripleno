@@ -289,7 +289,7 @@ EOFextport
 	. ~/stackrc || abort
 	set -x
 	date > ~/.overcloud.start 
-	openstack overcloud deploy -n ~/templates/network_data.yaml --answers-file $ANSWER_FILE >  ~/overcloud_deploy.log 2>&1 
+	openstack overcloud deploy -n ~/templates/network_data.yaml  --roles-file ~/templates/roles_data.yaml --answers-file $ANSWER_FILE >  ~/overcloud_deploy.log 2>&1 
 	[ "$?" = "0" ] || abort
 	date > ~/.overcloud.end
 	
