@@ -8,7 +8,6 @@ resource_registry:
   # Management network is optional and disabled by default
   #OS::TripleO::Controller::Ports::ManagementPort: ../network/ports/management_from_pool.yaml
 
-#  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/noop.yaml
   OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external_from_pool.yaml
   OS::TripleO::Compute::Ports::InternalApiPort: ../network/ports/internal_api_from_pool.yaml
   OS::TripleO::Compute::Ports::StoragePort: ../network/ports/storage_from_pool.yaml
