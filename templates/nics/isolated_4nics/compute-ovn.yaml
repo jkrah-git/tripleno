@@ -1,6 +1,6 @@
 heat_template_version: queens
 description: >
-  Software Config to drive os-net-config to configure VLANs for the Controller role.
+  Software Config to drive os-net-config to configure VLANs for the Compute role.
 parameters:
   ControlPlaneIp:
     default: ''
@@ -105,6 +105,9 @@ resources:
                 - ip_netmask: 169.254.169.254/32
                   next_hop:
                     get_param: EC2MetadataIp
+                - default: true
+                  next_hop:
+                    get_param: ControlPlaneDefaultRoute
                 members:
                 - type: interface
                   name: nic1
@@ -157,13 +160,13 @@ resources:
                 - type: vlan
                   vlan_id:
                     get_param: ExternalNetworkVlanID
-                  addresses:
-                  - ip_netmask:
-                      get_param: ExternalIpSubnet
-                  routes:
-                  - default: true
-                    next_hop:
-                      get_param: ExternalInterfaceDefaultRoute
+                  #addresses:
+                  #- ip_netmask:
+                  #    get_param: ExternalIpSubnet
+                  #routes:
+                  #- default: true
+                  #  next_hop:
+                  #    get_param: ExternalInterfaceDefaultRoute
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.
