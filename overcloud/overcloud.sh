@@ -249,7 +249,15 @@ if [ ! -f ~/.overcloud.end ]; then
 	/bin/cp ~/templates/nics/current/* ~/rendered/network/config/single-nic-vlans/ || abort "cp err"
 
 	if [ ! -z "$DOWNLOAD_OVN" ]; then
-		#cp -p templates/nics/net-single-nic-with-vlans.yaml.ovn rendered/environments/net-single-nic-with-vlans.yaml
+#		# brute force external_from_pool.yaml
+#		print "brute forcing 'external_from_pool'.."
+#		SED='s|\(.*OS::TripleO::Compute::Ports::ExternalPort:.*\)/noop.yaml|\1\/external_from_pool.yaml|g'
+#		############
+#		for F in `grep -rl 'OS::TripleO::Compute::Ports::ExternalPort:' ~/rendered/`; do 
+#			ls -l $F || break
+#			sed -i.pre-ovn "$SED" $F
+#		done
+
 		# add external to compute nic-config
 		cp -p ~/templates/nics/current/compute-ovn.yaml ~/rendered/network/config/single-nic-vlans/compute.yaml || abort 'overwrite comp nics for OVN failed'
 		# add export 'port' defn
@@ -257,9 +265,10 @@ if [ ! -f ~/.overcloud.end ]; then
 
 		grep OS::TripleO::Compute::Ports::ExternalPort ~/rendered/environments/network-isolation.yaml || cat >> ~/rendered/environments/network-isolation.yaml << EOFextport 
 
-  # Externa/Compute Port assignment for OVN
-  # OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
-  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external_from_pool.yaml
+# Externa/Compute Port assignment for OVN
+# OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external_from_pool.yaml
+  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml
+
 EOFextport
 	fi
 
