@@ -196,6 +196,7 @@ let START_TIME=`date +%s`
 	else
 		print "DOWNLOAD_OVN is SET.."
 		SRC_FILE=/usr/share/openstack-tripleo-heat-templates/environments/neutron-ml2-ovn-ha.yaml
+		#SRC_FILE=/usr/share/openstack-tripleo-heat-templates/environments/neutron-ml2-ovn-dvr-ha.yaml
 		REG_FILE=ovn_local_registry_images.yaml
 		ENV_FILE=ovn_overcloud_images_environment.yaml
 
